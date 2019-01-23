@@ -1,16 +1,24 @@
 package com.example.myapplication;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.io.File;
+
+import static com.example.myapplication.PictureContent.loadSavedImages;
+
 public class ScrollingActivity extends AppCompatActivity
         implements ItemFragment.OnListFragmentInteractionListener{
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +35,11 @@ public class ScrollingActivity extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });
+
+        if (recyclerView == null) {
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.main_fragment);
+            recyclerView = (RecyclerView) currentFragment.getView();
+        }
     }
 
     @Override
@@ -51,7 +64,21 @@ public class ScrollingActivity extends AppCompatActivity
     }
 
     @Override
-    public void onListFragmentInteraction(PictureContent.DummyItem item) {
+    protected void onResume() {
+        super.onResume();
+        final Activity context = this;
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                loadSavedImages(new File(context.getFilesDir() + "/images/"));
+                recyclerView.getAdapter().notifyDataSetChanged();
+            }
+        });
+    }
+
+    @Override
+    public void onListFragmentInteraction(PictureItem item) {
 
     }
 }
