@@ -9,8 +9,6 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.myapplication.dummy.DummyContent;
-
 public class ScrollingActivity extends AppCompatActivity
         implements ItemFragment.OnListFragmentInteractionListener{
 
@@ -53,7 +51,7 @@ public class ScrollingActivity extends AppCompatActivity
     }
 
     @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+    public void onListFragmentInteraction(PictureContent.DummyItem item) {
 
     }
 }

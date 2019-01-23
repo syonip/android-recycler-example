@@ -10,10 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.myapplication.dummy.DummyContent;
-import com.example.myapplication.dummy.DummyContent.DummyItem;
-
-import java.util.List;
+import com.example.myapplication.PictureContent.DummyItem;
 
 /**
  * A fragment representing a list of Items.
@@ -69,7 +66,7 @@ public class ItemFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyItemRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            recyclerView.setAdapter(new MyItemRecyclerViewAdapter(PictureContent.ITEMS, mListener));
         }
         return view;
     }
