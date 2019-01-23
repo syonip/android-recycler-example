@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +17,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.io.File;
+
 import static com.example.myapplication.PictureContent.downloadRandomImage;
 import static com.example.myapplication.PictureContent.loadSavedImages;
 
@@ -23,6 +26,7 @@ public class ScrollingActivity extends AppCompatActivity
         implements ItemFragment.OnListFragmentInteractionListener{
     private RecyclerView recyclerView;
     private ScrollingActivity context;
+    private DownloadManager downloadManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +36,7 @@ public class ScrollingActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         context = this;
-        final DownloadManager downloadmanager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -41,7 +45,7 @@ public class ScrollingActivity extends AppCompatActivity
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        downloadRandomImage(downloadmanager, context);
+                        downloadRandomImage(downloadManager, context);
                     }
                 });
             }
@@ -78,8 +82,21 @@ public class ScrollingActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
 
-        BroadcastReceiver onComplete=new BroadcastReceiver() {
+        BroadcastReceiver onComplete = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
+                String filePath="";
+                DownloadManager.Query q = new DownloadManager.Query();
+                q.setFilterById(intent.getExtras().getLong(DownloadManager.EXTRA_DOWNLOAD_ID));
+                Cursor c = downloadManager.query(q);
+
+                if (c.moveToFirst()) {
+                    int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
+                    if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                        filePath = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                    }
+                }
+                c.close();
+                PictureContent.loadImage(new File(filePath));
                 recyclerView.getAdapter().notifyDataSetChanged();
             }
         };

@@ -51,7 +51,7 @@ public class PictureContent {
     public static void downloadRandomImage(DownloadManager downloadmanager, Context context) {
 
         long ts = System.currentTimeMillis();
-        Uri uri = Uri.parse("https://picsum.photos/1000/500/?random");
+        Uri uri = Uri.parse("https://picsum.photos/200/300/?random");
 
         DownloadManager.Request request = new DownloadManager.Request(uri);
         request.setTitle("My File");
@@ -65,7 +65,7 @@ public class PictureContent {
         downloadmanager.enqueue(request);
     }
 
-    private static void loadImage(File file) {
+    public static void loadImage(File file) {
         PictureItem newItem = new PictureItem();
         newItem.uri = Uri.fromFile(file);
         addItem(newItem);
