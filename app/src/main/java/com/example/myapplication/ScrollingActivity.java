@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
@@ -29,6 +30,7 @@ public class ScrollingActivity extends AppCompatActivity
     private DownloadManager downloadManager;
     private RecyclerView.Adapter recyclerViewAdapter;
     private RecyclerView recyclerView;
+    private BroadcastReceiver onComplete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,14 +55,13 @@ public class ScrollingActivity extends AppCompatActivity
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-//                        downloadRandomImage(downloadManager, context);
-                        recyclerView.scrollToPosition(recyclerViewAdapter.getItemCount()-1);
+                        downloadRandomImage(downloadManager, context);
                     }
                 });
             }
         });
 
-        BroadcastReceiver onComplete = new BroadcastReceiver() {
+        onComplete = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
                 String filePath="";
                 DownloadManager.Query q = new DownloadManager.Query();
@@ -70,14 +71,13 @@ public class ScrollingActivity extends AppCompatActivity
                 if (c.moveToFirst()) {
                     int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
                     if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                        filePath = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                        String downloadFileLocalUri = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                        filePath = Uri.parse(downloadFileLocalUri).getPath();
                     }
                 }
                 c.close();
                 PictureContent.loadImage(new File(filePath));
-//                recyclerView.getAdapter().notifyDataSetChanged();
-                recyclerViewAdapter.notifyItemInserted(recyclerViewAdapter.getItemCount()-1);
-                recyclerView.scrollToPosition(recyclerViewAdapter.getItemCount()-1);
+                recyclerViewAdapter.notifyItemInserted(0);
             }
         };
 
@@ -107,6 +107,13 @@ public class ScrollingActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onStop()
+    {
+        unregisterReceiver(onComplete);
+        super.onStop();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -114,7 +121,7 @@ public class ScrollingActivity extends AppCompatActivity
             @Override
             public void run() {
                 loadSavedImages(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS));
-                recyclerView.getAdapter().notifyDataSetChanged();
+                recyclerViewAdapter.notifyDataSetChanged();
             }
         });
     }

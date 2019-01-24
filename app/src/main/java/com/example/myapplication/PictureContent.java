@@ -70,6 +70,6 @@ public class PictureContent {
     }
 
     private static void addItem(PictureItem item) {
-        ITEMS.add(item);
+        ITEMS.add(0, item);
     }
 }
