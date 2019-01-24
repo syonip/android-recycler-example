@@ -12,6 +12,7 @@ import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -46,6 +47,9 @@ public class ScrollingActivity extends AppCompatActivity
             Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.main_fragment);
             recyclerView = (RecyclerView) currentFragment.getView();
             recyclerViewAdapter = ((RecyclerView) currentFragment.getView()).getAdapter();
+            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                    DividerItemDecoration.VERTICAL);
+            recyclerView.addItemDecoration(dividerItemDecoration);
         }
 
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -129,6 +133,6 @@ public class ScrollingActivity extends AppCompatActivity
 
     @Override
     public void onListFragmentInteraction(PictureItem item) {
-
+        // This is where you'd handle clicking an item in the list
     }
 }
