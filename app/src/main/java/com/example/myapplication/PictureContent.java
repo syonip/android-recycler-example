@@ -32,21 +32,19 @@ public class PictureContent {
         }
     }
 
-//    private void deleteSavedImages() {
-//        File dir = new File(this.getFilesDir()+ "/images/");
-//        if (dir.exists()) {
-//            File[] files = dir.listFiles();
-//            for (File file : files) {
-//                String absolutePath = file.getAbsolutePath();
-//                String extension = absolutePath.substring(absolutePath.lastIndexOf("."));
-//                if (extension.equals(".jpg")) {
-//                    file.delete();
-//                }
-//            }
-//        }
-//        ITEMS.clear();
-//        recyclerView.getAdapter().notifyDataSetChanged();
-//    }
+    public static void deleteSavedImages(File dir) {
+        if (dir.exists()) {
+            File[] files = dir.listFiles();
+            for (File file : files) {
+                String absolutePath = file.getAbsolutePath();
+                String extension = absolutePath.substring(absolutePath.lastIndexOf("."));
+                if (extension.equals(".jpg")) {
+                    file.delete();
+                }
+            }
+        }
+        ITEMS.clear();
+    }
 
     public static void downloadRandomImage(DownloadManager downloadmanager, Context context) {
 

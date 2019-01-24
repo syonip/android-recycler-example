@@ -19,14 +19,16 @@ import android.view.View;
 
 import java.io.File;
 
+import static com.example.myapplication.PictureContent.deleteSavedImages;
 import static com.example.myapplication.PictureContent.downloadRandomImage;
 import static com.example.myapplication.PictureContent.loadSavedImages;
 
 public class ScrollingActivity extends AppCompatActivity
         implements ItemFragment.OnListFragmentInteractionListener{
-    private RecyclerView recyclerView;
     private ScrollingActivity context;
     private DownloadManager downloadManager;
+    private RecyclerView.Adapter recyclerViewAdapter;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,12 @@ public class ScrollingActivity extends AppCompatActivity
         context = this;
         downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
 
+        if (recyclerViewAdapter == null) {
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.main_fragment);
+            recyclerView = (RecyclerView) currentFragment.getView();
+            recyclerViewAdapter = ((RecyclerView) currentFragment.getView()).getAdapter();
+        }
+
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,16 +53,35 @@ public class ScrollingActivity extends AppCompatActivity
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        downloadRandomImage(downloadManager, context);
+//                        downloadRandomImage(downloadManager, context);
+                        recyclerView.scrollToPosition(recyclerViewAdapter.getItemCount()-1);
                     }
                 });
             }
         });
 
-        if (recyclerView == null) {
-            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.main_fragment);
-            recyclerView = (RecyclerView) currentFragment.getView();
-        }
+        BroadcastReceiver onComplete = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                String filePath="";
+                DownloadManager.Query q = new DownloadManager.Query();
+                q.setFilterById(intent.getExtras().getLong(DownloadManager.EXTRA_DOWNLOAD_ID));
+                Cursor c = downloadManager.query(q);
+
+                if (c.moveToFirst()) {
+                    int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
+                    if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                        filePath = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+                    }
+                }
+                c.close();
+                PictureContent.loadImage(new File(filePath));
+//                recyclerView.getAdapter().notifyDataSetChanged();
+                recyclerViewAdapter.notifyItemInserted(recyclerViewAdapter.getItemCount()-1);
+                recyclerView.scrollToPosition(recyclerViewAdapter.getItemCount()-1);
+            }
+        };
+
+        context.registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
 
     @Override
@@ -72,8 +99,9 @@ public class ScrollingActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_delete) {
+            deleteSavedImages(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS));
+            recyclerViewAdapter.notifyDataSetChanged();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -81,27 +109,6 @@ public class ScrollingActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-
-        BroadcastReceiver onComplete = new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                String filePath="";
-                DownloadManager.Query q = new DownloadManager.Query();
-                q.setFilterById(intent.getExtras().getLong(DownloadManager.EXTRA_DOWNLOAD_ID));
-                Cursor c = downloadManager.query(q);
-
-                if (c.moveToFirst()) {
-                    int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
-                    if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                        filePath = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-                    }
-                }
-                c.close();
-                PictureContent.loadImage(new File(filePath));
-                recyclerView.getAdapter().notifyDataSetChanged();
-            }
-        };
-
-        context.registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
         runOnUiThread(new Runnable() {
             @Override
