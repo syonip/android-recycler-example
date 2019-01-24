@@ -8,7 +8,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.myapplication.ItemFragment.OnListFragmentInteractionListener;
-import com.example.myapplication.PictureItem;
 
 import java.util.List;
 
@@ -38,6 +37,7 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mImageView.setImageURI(mValues.get(position).uri);
+        holder.mDateView.setText(mValues.get(position).date);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,12 +59,14 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final ImageView mImageView;
+        public final TextView mDateView;
         public PictureItem mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
             mImageView = view.findViewById(R.id.item_image_view);
+            mDateView = view.findViewById(R.id.item_date_tv);
         }
     }
 }

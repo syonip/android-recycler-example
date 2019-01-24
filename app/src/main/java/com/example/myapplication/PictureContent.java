@@ -6,7 +6,10 @@ import android.net.Uri;
 import android.os.Environment;
 
 import java.io.File;
+import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -63,9 +66,19 @@ public class PictureContent {
         downloadmanager.enqueue(request);
     }
 
+    private static String getDateFromUri(Uri uri){
+        String[] split = uri.getPath().split("/");
+        String fileName = split[split.length - 1];
+        String fileNameNoExt = fileName.split("\\.")[0];
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateString = format.format(new Date(Long.parseLong(fileNameNoExt)));
+        return dateString;
+    }
+
     public static void loadImage(File file) {
         PictureItem newItem = new PictureItem();
         newItem.uri = Uri.fromFile(file);
+        newItem.date = getDateFromUri(newItem.uri);
         addItem(newItem);
     }
 
