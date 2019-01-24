@@ -32,6 +32,7 @@ public class ScrollingActivity extends AppCompatActivity
     private RecyclerView.Adapter recyclerViewAdapter;
     private RecyclerView recyclerView;
     private BroadcastReceiver onComplete;
+    private View progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +53,17 @@ public class ScrollingActivity extends AppCompatActivity
             recyclerView.addItemDecoration(dividerItemDecoration);
         }
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        progressBar = findViewById(R.id.indeterminateBar);
+
+        final FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        progressBar.setVisibility(View.VISIBLE);
+                        fab.setVisibility(View.GONE);
                         downloadRandomImage(downloadManager, context);
                     }
                 });
@@ -82,6 +87,8 @@ public class ScrollingActivity extends AppCompatActivity
                 c.close();
                 PictureContent.loadImage(new File(filePath));
                 recyclerViewAdapter.notifyItemInserted(0);
+                progressBar.setVisibility(View.GONE);
+                fab.setVisibility(View.VISIBLE);
             }
         };
 
