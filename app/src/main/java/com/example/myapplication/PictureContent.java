@@ -52,7 +52,7 @@ public class PictureContent {
     public static void downloadRandomImage(DownloadManager downloadmanager, Context context) {
 
         long ts = System.currentTimeMillis();
-        Uri uri = Uri.parse("https://picsum.photos/200/300/?random");
+        Uri uri = Uri.parse(context.getString(R.string.image_download_url));
 
         DownloadManager.Request request = new DownloadManager.Request(uri);
         request.setTitle("My File");

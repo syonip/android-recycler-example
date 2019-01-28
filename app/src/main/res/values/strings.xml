@@ -3,4 +3,5 @@
 
     <string name="action_delete">Delete all</string>
     <string name="created_at">Created At:</string>
+    <string name="image_download_url">https://picsum.photos/200/300/?random</string>
 </resources>
